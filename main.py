@@ -3,10 +3,6 @@ import math
 from coppeliasim_zmqremoteapi_client import *
 import time
 
-import _thread
-
-
-
 
 client = RemoteAPIClient()
 sim = client.require('sim')
@@ -25,17 +21,14 @@ RETURN_REVERSE_DIST = 0.2
 DEVIATE_REVERSE_DIST = 0.1
 
 SAFETY_ACT = False
+DROPFRONT = True
+DROPLEFT = True
+DROPRIGHT = True
 
 class Side(Enum):
     LEFT = 1
     RIGHT = 0
-
-def dontKYS():
-    print("VAI CAIRRRR!!!")
-    motorControl(0.0,0.0)
-    backupALitte(RETURN_REVERSE_DIST)
-    turnBack()
-
+    
 def backupALitte(reverse_distance):
     print("Dando ré")
     dist_total = 0
@@ -94,7 +87,21 @@ def deviate(side):
             backupALitte(DEVIATE_REVERSE_DIST)
             turn(side.RIGHT,90)
             turn(side.LEFT,90)
-               
+            
+def turnBack():
+    global LAST_TURN
+    if LAST_TURN == Side.RIGHT:
+        backupALitte(RETURN_REVERSE_DIST)
+        turn(Side.LEFT,180)
+        LAST_TURN = Side.LEFT
+    else:
+        backupALitte(RETURN_REVERSE_DIST)
+        turn(Side.RIGHT,180)
+        LAST_TURN = Side.RIGHT
+                   
+    
+    ##------------------------------------------------------------------------------------------------------------
+    
     
 sim.startSimulation()
 try:
@@ -113,26 +120,15 @@ try:
     rightDrop_handle = sim.getObject(f'/{robot_name}/dropRight')
     leftDrop_handle  = sim.getObject(f'/{robot_name}/dropLeft')
     
-    
     print("Todos os objetos encontrados")
-    safety = _thread.start_new_thread(dontKYS,())
     
 except Exception as e:
     print(f"Erro ao obter os handles: {e}")
     sim.stopSimulation()
     exit()
-    
-def turnBack():
-    global LAST_TURN
-    if LAST_TURN == Side.RIGHT:
-        backupALitte(RETURN_REVERSE_DIST)
-        turn(Side.LEFT,180)
-        LAST_TURN = Side.LEFT
-    else:
-        backupALitte(RETURN_REVERSE_DIST)
-        turn(Side.RIGHT,180)
-        LAST_TURN = Side.RIGHT
-    
+
+
+
     
 currTime = lastTime = sim.getSimulationTime()
 angleDeviation = 0
@@ -154,35 +150,42 @@ while sim.getSimulationState() != sim.simulation_stopped:
     result_bumper_front, bumper_front_dist, _, _, _ = sim.readProximitySensor(bumperFront_handle)
     result_bumper_right, bumper_right_dist, _, _, _ = sim.readProximitySensor(bumperRight_handle)
     result_bumper_left,  bumper_left_dist,  _, _, _ = sim.readProximitySensor(bumperLeft_handle)
+    
+    DROPFRONT, _, _, _, _ = sim.readProximitySensor(frontDrop_handle)
+    DROPRIGHT, _, _, _, _ = sim.readProximitySensor(rightDrop_handle)
+    DROPLEFT,  _,  _, _, _ = sim.readProximitySensor(leftDrop_handle)
 
+    
+    SAFETY_ACT = not( DROPRIGHT and DROPFRONT and  DROPLEFT)
     
     
     angleDeviation += degree * dt * 0.6 #K integral
     print(f"integral: {angleDeviation}")
     
-    #print(f'SR: {bumper_right_dist:.2f}/ SF: {bumper_front_dist:.2f}/ SL: {bumper_left_dist:.2f}/')
+    
     if SAFETY_ACT:
         print('Detectada queda!')
         turnBack()
+        angleDeviation = 0
+        
     
     if result_bumper_front:     
         print("Tocou!")
         turnBack()
         angleDeviation = 0
-        lastTime = sim.getSimulationTime()
         
     if result_bumper_left:
         print("Tocou LEFT!")
         deviate(Side.RIGHT)
         angleDeviation = 0
-        lastTime = sim.getSimulationTime()
+        
     
     if result_bumper_right:
         print("Tocou! RIGHT")
         deviate(Side.LEFT)
         angleDeviation = 0
-        lastTime = sim.getSimulationTime()
         
+    lastTime = sim.getSimulationTime()    
     time.sleep(0.05)
  
 print("Teste finalizado")
