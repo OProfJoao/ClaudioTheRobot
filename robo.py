@@ -2,6 +2,7 @@
 from sensors import *
 from actuators import *
 from navigation import Navigation
+from sensors import *
 
 class Robo():
     def __init__(self,sim, robotName):
