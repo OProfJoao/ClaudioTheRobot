@@ -46,6 +46,7 @@ class Robo():
         self.deviateSide = "RIGHT"
         self.firstTurn = True
 
+
         left_bumper_name = "/bumperLeft"
         right_bumper_name = "/bumperRight"
         front_bumper_name = "/bumperFront"
@@ -75,15 +76,15 @@ class Robo():
 
         self.gyro = GyroSensor(sim, gyro_name, robotName)
 
-       
         self.leftWheel = Motors(sim, left_wheel_name, robotName)
         self.rightWheel = Motors(sim, right_wheel_name, robotName)
 
-       
         self.navigation = Navigation(
             leftWheel=self.leftWheel,
             rightWheel=self.rightWheel
         )
+
+        
     def normalCleaning(self):
 
         def _getAngle(angularV):
@@ -95,18 +96,21 @@ class Robo():
         dt = currentTime - self.lastTime
         self.lastTime = currentTime
 
-        frontBumperValue = self.frontBumper.measureDistance()[0]
         leftBumperValue = self.leftBumper.measureDistance()[0]
+        frontBumperValue = self.frontBumper.measureDistance()[0]
         rightBumperValue = self.rightBumper.measureDistance()[0]
 
         leftDropValue = self.leftDrop.measureDistance()[1]
-        rightDropValue = self.rightDrop.measureDistance()[1]
         frontDropValue = self.frontDrop.measureDistance()[1]
-
+        rightDropValue = self.rightDrop.measureDistance()[1]
+        
         linearVelocityValue, angularVelocityvalue = self.gyro.measureGyro()
-        self.rodeDistance += max(abs(x) for x in linearVelocityValue) * dt
         
         self.absoluteOrientationRad += angularVelocityvalue[2] * dt
+
+
+
+        self.rodeDistance += max(abs(x) for x in linearVelocityValue) * dt
 
         if (frontDropValue > MIN_DROP_HEIGHT and self.currentState != self.robotState.BACKWARD) or (self.currentState == self.robotState.FORWARD and frontBumperValue):
             print("Obstaculo detectado a frente!")
