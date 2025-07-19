@@ -12,7 +12,6 @@ class Robo():
         FORWARD = auto()
         BACKWARD = auto()
         TURNING = auto()
-        
 
     def __init__(self, sim, robotName):
         self.robotName = robotName
@@ -75,7 +74,7 @@ class Robo():
         rightBumperValue = self.rightBumper.measureDistance()[0]
 
         leftDropValue = self.leftDrop.measureDistance()[1]
-        rightDropValue  = self.rightDrop.measureDistance()[1]
+        rightDropValue = self.rightDrop.measureDistance()[1]
         frontDropValue = self.frontDrop.measureDistance()[1]
 
         linearVelocityValue, angularVelocityvalue = self.gyro.measureGyro()
@@ -90,7 +89,7 @@ class Robo():
             self.currentTurn = "LEFT" if self.currentTurn == "LEFT" else "RIGHT"
             return
 
-        if not(frontDropValue < 0.06):
+        if frontDropValue > 0.06 and not (self.getCurrentState() == self.robotState.BACKWARD):
             print("Queda detectada a frente!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -99,8 +98,8 @@ class Robo():
             self.setCurrentState(self.robotState.BACKWARD)
             self.currentTurn = "LEFT" if self.currentTurn == "LEFT" else "RIGHT"
             return
-        
-        if not (leftDropValue < 0.06):
+
+        if leftDropValue > 0.06 and not (self.getCurrentState() == self.robotState.BACKWARD):
             print("Queda detectada a esquerda!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -109,8 +108,8 @@ class Robo():
             self.setCurrentState(self.robotState.BACKWARD)
             self.currentTurn = "RIGHT"
             return
-        
-        if not (rightDropValue < 0.06):
+
+        if rightDropValue > 0.06 and not (self.getCurrentState() == self.robotState.BACKWARD):
             print("Queda detectada a direita!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -120,26 +119,22 @@ class Robo():
             self.currentTurn = "LEFT"
             return
 
-
-
-
         match self.getCurrentState():
             case self.robotState.FORWARD:
                 self.navigation._moveForward()
 
             case self.robotState.BACKWARD:
                 self.navigation._moveBackward()
-                self.backwardDistance += linearVelocityValue[0] * dt
-                if abs(self.backwardDistance) >= self.backwardDistanceTarget:
+                self.backwardDistance += max(abs(x)
+                                             for x in linearVelocityValue) * dt
+                if self.backwardDistance >= self.backwardDistanceTarget:
                     self.setCurrentState(self.robotState.TURNING)
 
             case self.robotState.TURNING:
                 self.navigation._turnRobot(self.currentTurn)
                 self.turningAngle += math.degrees(angularVelocityvalue[2] * dt)
-                print(abs(self.turningAngle))
                 if abs(self.turningAngle) >= self.turningAngleTarget:
                     self.setCurrentState(self.robotState.FORWARD)
-
 
             case self.robotState.STOPPED:
                 self.navigation._stopRobot()
