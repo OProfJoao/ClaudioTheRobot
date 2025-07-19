@@ -20,11 +20,11 @@ class Navigation:
 
     def _turnRobot(self, side):
         if side == 'RIGHT':
-            self.rightWheel.setSpeed(-0.08)
+            self.rightWheel.setSpeed(-0.1)
             self.leftWheel.setSpeed(0.4)
         else:
             self.rightWheel.setSpeed(0.4)
-            self.leftWheel.setSpeed(-0.08)
+            self.leftWheel.setSpeed(-0.1)
 
     def _turnRobot180(self):
             self.rightWheel.setSpeed(-0.4)

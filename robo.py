@@ -21,7 +21,7 @@ class Robo():
         DEVIATING_SECOND = auto()
         DEVIATING_THIRD = auto()
 
-        
+
     def _setupSensors(self,sim,robotName):
         left_bumper_name = "/bumperLeft"
         right_bumper_name = "/bumperRight"
@@ -183,7 +183,7 @@ class Robo():
 
         match self.currentState:
             case self.robotState.FORWARD:
-                self.angularError += angularVelocityvalue[2] * dt * 1.5
+                self.angularError += angularVelocityvalue[2] * dt * 2
                 #print(f'{self.angularError:.4f}')
                 if self.angularError > MAXDEVIATION:
                     self.navigation._moveForward(0.8 + abs(self.angularError),0.8 - abs(self.angularError))
