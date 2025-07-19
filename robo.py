@@ -12,19 +12,24 @@ class Robo():
         FORWARD = auto()
         BACKWARD = auto()
         TURNING = auto()
-        MOVING_CURVE = auto()
+        DEVIATING_FIRST = auto()
+        DEVIATING_SECOND = auto()
+        DEVIATING_THIRD = auto()
 
     def __init__(self, sim, robotName):
         self.robotName = robotName
         self.sim = sim
         self.currentState = self.robotState.FORWARD
-        self.nextState = self.robotState.FORWARD
         self.lastTime = 0
         self.currentTurn = "RIGHT"
         self.backwardDistanceTarget = 0.0
         self.backwardDistance = 0.0
         self.turningAngleTarget = 0.0
+        self.rodeDistance = 0.0
+        self.maxRodeDistance = 0.0
         self.turningAngle = 0.0
+
+        self.curveSide = "RIGHT"
 
         left_bumper_name = "/bumperLeft"
         right_bumper_name = "/bumperRight"
@@ -74,8 +79,9 @@ class Robo():
         frontDropValue = self.frontDrop.measureDistance()[1]
 
         linearVelocityValue, angularVelocityvalue = self.gyro.measureGyro()
+        self.rodeDistance += max(abs(x) for x in linearVelocityValue) * dt
 
-        if (frontDropValue > 0.06 and not (self.currentState == self.robotState.BACKWARD)) or (self.currentState == self.robotState.FORWARD and frontBumperValue):
+        if (frontDropValue > 0.06 and self.currentState != self.robotState.BACKWARD) or (self.currentState == self.robotState.FORWARD and frontBumperValue):
             print("Obstaculo detectado a frente!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -83,10 +89,23 @@ class Robo():
             self.turningAngle = 0.0
             self.currentState = (self.robotState.BACKWARD)
             self.nextState = self.robotState.TURNING
-            self.currentTurn = "LEFT" if self.currentTurn == "RIGHT" else "RIGHT"
+            print(f'rode: {self.rodeDistance} max: {self.maxRodeDistance}')
+            if self.rodeDistance > self.maxRodeDistance  :
+                print("A")
+                self.maxRodeDistance = self.rodeDistance
+                self.currentTurn = "LEFT" if self.currentTurn == "RIGHT" else "RIGHT"
+                self.rodeDistance = 0
+
+            else:
+                print("B")
+                self.maxRodeDistance = self.rodeDistance
+                self.currentTurn = self.currentTurn
+                self.rodeDistance = 0
+
+            
             return
 
-        if (leftDropValue > 0.06 and not (self.currentState == self.robotState.BACKWARD)) or (self.currentState == self.robotState.FORWARD and leftBumperValue):
+        if (leftDropValue > 0.06 and self.currentState != self.robotState.BACKWARD) or (self.currentState == self.robotState.FORWARD and leftBumperValue):
             print("Obstaculo detectado a esquerda!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -94,10 +113,10 @@ class Robo():
             self.turningAngle = 0.0
             self.currentState = (self.robotState.BACKWARD)
             self.nextState = self.robotState.MOVING_CURVE
-            self.currentTurn = "RIGHT"
+            self.curveSide = "RIGHT"
             return
 
-        if (rightDropValue > 0.06 and not (self.currentState == self.robotState.BACKWARD)) or (self.currentState == self.robotState.FORWARD and rightBumperValue):
+        if (rightDropValue > 0.06 and self.currentState != self.robotState.BACKWARD) or (self.currentState == self.robotState.FORWARD and rightBumperValue):
             print("Obstaculo detectado a direita!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -105,7 +124,7 @@ class Robo():
             self.turningAngle = 0.0
             self.currentState = (self.robotState.BACKWARD)
             self.nextState = self.robotState.MOVING_CURVE
-            self.currentTurn = "LEFT"
+            self.curveSide = "LEFT"
             return
 
 
@@ -133,7 +152,11 @@ class Robo():
 
 
             case self.robotState.TURNING:
-                self.navigation._turnRobot(self.currentTurn)
+                if self.nextState == self.robotState.MOVING_CURVE:
+                    self.navigation._turnRobot(self.curveSide)
+                else:
+                    self.navigation._turnRobot(self.currentTurn)
+
                 self.turningAngle += math.degrees(angularVelocityvalue[2] * dt)
                 if abs(self.turningAngle) >= self.turningAngleTarget:
                     if self.nextState == self.robotState.MOVING_CURVE:
@@ -146,7 +169,7 @@ class Robo():
            
 
             case self.robotState.MOVING_CURVE:
-                turn = "LEFT" if self.currentTurn == "RIGHT" else "RIGHT"
+                turn = "LEFT" if self.curveSide == "RIGHT" else "RIGHT"
                 self.navigation._deviate(turn)
                 self.turningAngle += math.degrees(angularVelocityvalue[2] * dt)
                 if abs(self.turningAngle) >= self.turningAngleTarget:
