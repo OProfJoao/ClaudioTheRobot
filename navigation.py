@@ -11,9 +11,9 @@ class Navigation:
         self.leftWheel = leftWheel
         self.rightWheel = rightWheel
 
-    def _moveForward(self, speed=0.8):
-        self.rightWheel.setSpeed(speed)
-        self.leftWheel.setSpeed(speed)
+    def _moveForward(self, left=0.8,right = 0.8):
+        self.rightWheel.setSpeed(right)
+        self.leftWheel.setSpeed(left)
 
     def _stopRobot(self):
         self._moveForward(0.0)
