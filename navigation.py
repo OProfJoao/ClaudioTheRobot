@@ -20,16 +20,14 @@ class Navigation:
 
     def _turnRobot(self, side):
         if side == 'RIGHT':
-            print("Virando para direita...")
             self.rightWheel.setSpeed(-0.08)
             self.leftWheel.setSpeed(0.4)
         else:
-            print("Virando para esquerda...")
+
             self.rightWheel.setSpeed(0.4)
             self.leftWheel.setSpeed(-0.08)
 
 
     def _moveBackward(self):
-        print("Dando ré...")
         self.rightWheel.setSpeed(-0.4)
         self.leftWheel.setSpeed(-0.4)

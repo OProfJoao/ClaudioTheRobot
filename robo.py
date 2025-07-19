@@ -85,14 +85,41 @@ class Robo():
             self.setCurrentState(self.robotState.BACKWARD)
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
+            self.turningAngleTarget = 180
+            self.turningAngle = 0.0
             self.currentTurn = "LEFT" if self.currentTurn == "LEFT" else "RIGHT"
             return
 
-        if not(leftDropValue < 0.06 and frontDropValue < 0.06 and rightDropValue <0.06):
-            print("Queda detectada!")
-            self.backwardDistance = 0.2
+        if not(frontDropValue < 0.06):
+            print("Queda detectada a frente!")
+            self.backwardDistanceTarget = 0.2
+            self.backwardDistance = 0.0
+            self.turningAngleTarget = 180
+            self.turningAngle = 0.0
             self.setCurrentState(self.robotState.BACKWARD)
+            self.currentTurn = "LEFT" if self.currentTurn == "LEFT" else "RIGHT"
             return
+        
+        if not (leftDropValue < 0.06):
+            print("Queda detectada a esquerda!")
+            self.backwardDistanceTarget = 0.2
+            self.backwardDistance = 0.0
+            self.turningAngleTarget = 45
+            self.turningAngle = 0.0
+            self.setCurrentState(self.robotState.BACKWARD)
+            self.currentTurn = "RIGHT"
+            return
+        
+        if not (rightDropValue < 0.06):
+            print("Queda detectada a direita!")
+            self.backwardDistanceTarget = 0.2
+            self.backwardDistance = 0.0
+            self.turningAngleTarget = 45
+            self.turningAngle = 0.0
+            self.setCurrentState(self.robotState.BACKWARD)
+            self.currentTurn = "LEFT"
+            return
+
 
 
 
@@ -105,8 +132,6 @@ class Robo():
                 self.backwardDistance += linearVelocityValue[0] * dt
                 if abs(self.backwardDistance) >= self.backwardDistanceTarget:
                     self.setCurrentState(self.robotState.TURNING)
-                    self.backwardDistance = 0.0
-                    self.turningAngleTarget = 180
 
             case self.robotState.TURNING:
                 self.navigation._turnRobot(self.currentTurn)
@@ -114,7 +139,6 @@ class Robo():
                 print(abs(self.turningAngle))
                 if abs(self.turningAngle) >= self.turningAngleTarget:
                     self.setCurrentState(self.robotState.FORWARD)
-                    self.turningAngle = 0.0
 
 
             case self.robotState.STOPPED:
