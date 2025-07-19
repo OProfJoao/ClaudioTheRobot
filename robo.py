@@ -21,32 +21,8 @@ class Robo():
         DEVIATING_SECOND = auto()
         DEVIATING_THIRD = auto()
 
-    def __init__(self, sim, robotName):
-        self.sim = sim
-        self.robotName = robotName
-
-
-        self.currentState = self.robotState.FORWARD
-        self.nextState = self.robotState.FORWARD
-
-
-        self.lastTime = 0
-        self.rodeDistance = 0.0
-        self.maxRodeDistance = 0.0
-        self.backwardDistance = 0.0
-        self.backwardDistanceTarget = 0.0
-
-
-        self.angularError = 0
-        self.relativeAngle = 0
-        self.absoluteOrientationRad = 0
-        self.turningAngleTarget = 0.0
-        self.turnAngle = 0
-        self.currentTurn = "RIGHT"
-        self.deviateSide = "RIGHT"
-        self.firstTurn = True
-
-
+        
+    def _setupSensors(self,sim,robotName):
         left_bumper_name = "/bumperLeft"
         right_bumper_name = "/bumperRight"
         front_bumper_name = "/bumperFront"
@@ -58,11 +34,8 @@ class Robo():
         left_IR_name = "/IRLeft"
         front_IR_name = "/IRFront"
 
-        left_wheel_name = "/leftMotor"
-        right_wheel_name = "/rightMotor"
-        gyro_name = ""  
+        gyro_name = "" 
 
-   
         self.leftBumper = ProximitySensor(sim, left_bumper_name, robotName)
         self.rightBumper = ProximitySensor(sim, right_bumper_name, robotName)
         self.frontBumper = ProximitySensor(sim, front_bumper_name, robotName)
@@ -76,6 +49,10 @@ class Robo():
 
         self.gyro = GyroSensor(sim, gyro_name, robotName)
 
+    def _setupActuators(self,sim,robotName):
+        left_wheel_name = "/leftMotor"
+        right_wheel_name = "/rightMotor"
+
         self.leftWheel = Motors(sim, left_wheel_name, robotName)
         self.rightWheel = Motors(sim, right_wheel_name, robotName)
 
@@ -84,7 +61,33 @@ class Robo():
             rightWheel=self.rightWheel
         )
 
-        
+
+    def __init__(self, sim, robotName):
+        self.sim = sim
+        self.robotName = robotName
+
+        self._setupSensors(self.sim,self.robotName)
+        self._setupActuators(self.sim,self.robotName)
+
+        self.currentState = self.robotState.FORWARD
+        self.nextState = self.robotState.FORWARD
+
+        self.lastTime = 0
+        self.rodeDistance = 0.0
+        self.maxRodeDistance = 0.0
+        self.backwardDistance = 0.0
+        self.backwardDistanceTarget = 0.0
+
+        self.angularError = 0
+        self.relativeAngle = 0
+        self.absoluteOrientationRad = 0
+        self.turningAngleTarget = 0.0
+        self.turnAngle = 0
+        self.currentTurn = "RIGHT"
+        self.deviateSide = "RIGHT"
+        self.firstTurn = True
+
+    
     def normalCleaning(self):
 
         def _getAngle(angularV):
