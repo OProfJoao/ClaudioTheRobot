@@ -79,7 +79,7 @@ class Robo():
         self.backwardDistanceTarget = 0.0
 
         self.angularError = 0
-        self.relativeAngle = 0
+        #self.relativeAngle = 0
         self.absoluteOrientationRad = 0
         self.turningAngleTarget = 0.0
         self.turnAngle = 0
@@ -92,8 +92,8 @@ class Robo():
 
         def _getAngle(angularV):
             delta_angle = math.degrees(angularV * dt)
-            self.relativeAngle += delta_angle
-            return abs(self.relativeAngle)
+            relativeAngle += delta_angle
+            return abs(relativeAngle)
         
         currentTime = self.sim.getSimulationTime()
         dt = currentTime - self.lastTime
@@ -215,6 +215,9 @@ class Robo():
 
 
             case self.robotState.TURNING:
+                error = abs(_getAngle(angularVelocityvalue[2]) - self.turningAngleTarget)
+                speed = 123
+                
                 self.navigation._turnRobot(self.currentTurn)
                 if _getAngle(angularVelocityvalue[2])>= self.turningAngleTarget:
                     self.relativeAngle = 0
