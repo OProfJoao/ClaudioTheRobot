@@ -12,6 +12,7 @@ class Robo():
         FORWARD = auto()
         BACKWARD = auto()
         TURNING = auto()
+        TURNING180 = auto()
         DEVIATING_FIRST = auto()
         DEVIATING_SECOND = auto()
         DEVIATING_THIRD = auto()
@@ -32,6 +33,8 @@ class Robo():
         self.turningAngle = 0.0
 
         self.deviateSide = "RIGHT"
+
+        self.firstTurn = False
 
         left_bumper_name = "/bumperLeft"
         right_bumper_name = "/bumperRight"
@@ -90,7 +93,11 @@ class Robo():
             self.turningAngleTarget = 180
             self.turningAngle = 0.0
             self.currentState = (self.robotState.BACKWARD)
-            self.nextState = self.robotState.TURNING
+            if self.firstTurn:
+                self.nextState = self.robotState.TURNING180
+            else:
+                self.nextState = self.robotState.TURNING
+
             print(f'rode: {self.rodeDistance} max: {self.maxRodeDistance}')
             if self.rodeDistance > self.maxRodeDistance  :
                 print("A")
@@ -148,10 +155,14 @@ class Robo():
                 self.backwardDistance += max(abs(x)
                                              for x in linearVelocityValue) * dt
                 if self.backwardDistance >= self.backwardDistanceTarget:
-                    if self.nextState != self.robotState.DEVIATING_FIRST:
-                        self.currentState = self.robotState.TURNING
-                    else:
-                        self.currentState = self.robotState.DEVIATING_FIRST
+                    match self.nextState:
+                        case self.robotState.DEVIATING_FIRST:
+                            self.currentState = self.robotState.DEVIATING_FIRST
+                        case self.robotState.TURNING180:
+                            self.currentState = self.robotState.TURNING180
+                        case _:
+                            self.currentState = self.robotState.TURNING
+                        
 
             case self.robotState.STOPPED:
                 self.navigation._stopRobot()
