@@ -5,7 +5,7 @@ from actuators import *
 from navigation import Navigation
 from sensors import *
 
-MAXDEVIATION = 0.005
+MAXDEVIATION = 0.003
 MIN_DROP_HEIGHT = 0.06
 
 
@@ -116,7 +116,7 @@ class Robo():
 
         if (frontDropValue > MIN_DROP_HEIGHT) or (self.currentState == self.robotState.FORWARD and frontBumperValue):
             print("Obstaculo detectado a frente!")
-            self.backwardDistanceTarget = 0.2
+            self.backwardDistanceTarget = 0.3
             self.backwardDistance = 0.0
 
             self.relativeAngle = 0
@@ -183,18 +183,14 @@ class Robo():
         match self.currentState:
             case self.robotState.FORWARD:
                 self.angularError += angularVelocityvalue[2] * dt
-                correction = self.angularError * 2
-                #print(f'{self.angularError:.4f}')
-                if self.angularError > MAXDEVIATION:
-                    left_speed = max(min(0.8 + correction, 0.8), 0)
-                    right_speed = max(min(0.8 - correction, 0.8), 0)
+                correction = self.angularError * 5
+                print(f'{self.angularError:.4f}')
+                if abs(self.angularError) > MAXDEVIATION:
+                    left_speed = 0.8 + correction
+                    left_speed = max(0.2,min(left_speed,0.8))
+                    right_speed = 0.8 - correction
+                    right_speed = max(0.2,min(right_speed,0.8))
                     self.navigation._moveForward(left_speed,right_speed)
-                    pass
-                elif self.angularError < -MAXDEVIATION:
-                    left_speed = max(min(0.8 - correction, 0.8), 0)
-                    right_speed = max(min(0.8 + correction, 0.8), 0)
-                    self.navigation._moveForward(left_speed,right_speed)
-                    pass
                 else:
                     self.navigation._moveForward()
 
@@ -211,7 +207,7 @@ class Robo():
 
                         case self.robotState.TURNING180:
                             self.currentState = self.robotState.TURNING180
-                            
+
                         case _:
                             self.currentState = self.robotState.TURNING
                         
