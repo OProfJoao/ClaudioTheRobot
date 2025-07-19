@@ -40,4 +40,20 @@ class Robo():
         self.leftWheel = Motors(sim, left_wheel_name, robotName)
         self.rightWheel = Motors(sim, right_wheel_name, robotName)
 
-        self.navigation   = Navigation(leftWheel=self.leftWheel, rightWheel=self.rightWheel)
+        self.navigation   = Navigation(
+            leftWheel=self.leftWheel,
+            rightWheel=self.rightWheel,
+            
+            leftBumper=self.leftBumper,
+            rightBumper=self.rightBumper,
+            frontBumper=self.frontBumper,
+
+            leftDrop=self.leftDrop,
+            rightDrop=self.rightDrop,
+            frontDrop=self.frontDrop,
+
+            frontIR= self.frontIR,
+            leftIR=self.leftIR,
+            gyro = self.gyro,
+            sim = sim
+            )

@@ -18,7 +18,8 @@ def main():
         print("Todos os objetos encontrados")
         print("Iniciando teste")
         sim.startSimulation()
-        vacuum.navigation.moveStraight(0.5)
+        while True:
+            vacuum.navigation.normalCleaning()
         
         
 
