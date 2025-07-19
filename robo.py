@@ -34,7 +34,7 @@ class Robo():
 
         self.deviateSide = "RIGHT"
 
-        self.firstTurn = False
+        self.firstTurn = True
 
         left_bumper_name = "/bumperLeft"
         right_bumper_name = "/bumperRight"
@@ -93,24 +93,26 @@ class Robo():
             self.turningAngleTarget = 180
             self.turningAngle = 0.0
             self.currentState = (self.robotState.BACKWARD)
+
             if self.firstTurn:
                 self.nextState = self.robotState.TURNING180
+                self.firstTurn = False
             else:
                 self.nextState = self.robotState.TURNING
 
-            print(f'rode: {self.rodeDistance} max: {self.maxRodeDistance}')
-            if self.rodeDistance > self.maxRodeDistance  :
-                print("A")
-                self.maxRodeDistance = self.rodeDistance
-                self.currentTurn = self.currentTurn
-                self.rodeDistance = 0
+                print(f'rode: {self.rodeDistance} max: {self.maxRodeDistance}')
+                if self.rodeDistance > self.maxRodeDistance  :
+                    print("A")
+                    self.maxRodeDistance = self.rodeDistance
+                    self.currentTurn = self.currentTurn
+                    self.rodeDistance = 0
 
-            else:
-                print("B")
-                self.maxRodeDistance = self.rodeDistance
-                
-                self.currentTurn = "LEFT" if self.currentTurn == "RIGHT" else "RIGHT"
-                self.rodeDistance = 0
+                else:
+                    print("B")
+                    self.maxRodeDistance = self.rodeDistance
+                    
+                    self.currentTurn = "LEFT" if self.currentTurn == "RIGHT" else "RIGHT"
+                    self.rodeDistance = 0
 
             
             return
@@ -136,10 +138,6 @@ class Robo():
             self.nextState = self.robotState.DEVIATING_FIRST
             self.deviateSide = "LEFT"
             return
-
-
-
-
 
 
 
@@ -174,6 +172,13 @@ class Robo():
                 self.turningAngle += math.degrees(angularVelocityvalue[2] * dt)
                 if abs(self.turningAngle) >= self.turningAngleTarget:
                     self.currentState = self.robotState.FORWARD
+
+            case self.robotState.TURNING180:
+                self.navigation._turnRobot180()
+                self.turningAngle += math.degrees(angularVelocityvalue[2] * dt)
+                if abs(self.turningAngle) >= self.turningAngleTarget:
+                    self.currentState = self.robotState.FORWARD
+
 
             case self.robotState.DEVIATING_FIRST:
                 self.navigation._turnRobot(self.deviateSide)
