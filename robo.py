@@ -79,7 +79,7 @@ class Robo():
         self.backwardDistanceTarget = 0.0
 
         self.angularError = 0
-        #self.relativeAngle = 0
+        self.relativeAngle = 0
         self.absoluteOrientationRad = 0
         self.turningAngleTarget = 0.0
         self.turnAngle = 0
@@ -92,8 +92,7 @@ class Robo():
 
         def _getAngle(angularV):
             delta_angle = math.degrees(angularV * dt)
-            relativeAngle += delta_angle
-            return abs(relativeAngle)
+            self.relativeAngle += abs(delta_angle)
         
         currentTime = self.sim.getSimulationTime()
         dt = currentTime - self.lastTime
@@ -215,26 +214,32 @@ class Robo():
 
 
             case self.robotState.TURNING:
-                error = abs(_getAngle(angularVelocityvalue[2]) - self.turningAngleTarget)
-                speed = 123
+                _getAngle(angularVelocityvalue[2])
+                error = abs(self.relativeAngle - self.turningAngleTarget)
+                speed = max(error * 0.004,0.2)
                 
-                self.navigation._turnRobot(self.currentTurn)
-                if _getAngle(angularVelocityvalue[2])>= self.turningAngleTarget:
+                self.navigation._turnRobot(self.currentTurn,speed)
+                if self.relativeAngle >= self.turningAngleTarget:
                     self.relativeAngle = 0
                     self.currentState = self.robotState.FORWARD
                     
 
             case self.robotState.TURNING180:
-                self.navigation._turnRobot180()
+                _getAngle(angularVelocityvalue[2])
+                error = abs(self.relativeAngle - self.turningAngleTarget)
+                speed = max(error * 0.004,0.2)
 
-                if _getAngle(angularVelocityvalue[2])>= self.turningAngleTarget:
+                self.navigation._turnRobot180(speed)
+                
+                if self.relativeAngle>= self.turningAngleTarget:
                     self.relativeAngle = 0
                     self.currentState = self.robotState.FORWARD
 
 
             case self.robotState.DEVIATING_FIRST:
                 self.navigation._turnRobot(self.deviateSide)
-                if _getAngle(angularVelocityvalue[2])>= self.turningAngleTarget:
+                _getAngle(angularVelocityvalue[2])
+                if self.relativeAngle>= self.turningAngleTarget:
                     self.relativeAngle = 0
                     self.turningAngleTarget = 90
                     self.currentState = self.robotState.DEVIATING_SECOND
@@ -242,14 +247,16 @@ class Robo():
             case self.robotState.DEVIATING_SECOND:
                 side = "LEFT" if self.deviateSide == "RIGHT" else "RIGHT"
                 self.navigation._deviate(side)
-                if _getAngle(angularVelocityvalue[2])>= self.turningAngleTarget:
+                _getAngle(angularVelocityvalue[2])
+                if self.relativeAngle >= self.turningAngleTarget:
                     self.relativeAngle = 0
                     self.turningAngleTarget = 45
                     self.currentState = self.robotState.DEVIATING_THIRD
 
             case self.robotState.DEVIATING_THIRD:
                 self.navigation._turnRobot(self.deviateSide)
-                if _getAngle(angularVelocityvalue[2])>= self.turningAngleTarget:
+                _getAngle(angularVelocityvalue[2])
+                if self.relativeAngle >= self.turningAngleTarget:
                     self.relativeAngle = 0
                     self.currentState = self.robotState.FORWARD
 

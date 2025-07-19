@@ -26,9 +26,9 @@ class Navigation:
             self.rightWheel.setSpeed(speed)
             self.leftWheel.setSpeed(0)
 
-    def _turnRobot180(self):
-            self.rightWheel.setSpeed(-0.4)
-            self.leftWheel.setSpeed(0.4)
+    def _turnRobot180(self,speed = 0.4):
+            self.rightWheel.setSpeed(-speed)
+            self.leftWheel.setSpeed(speed)
 
     def _moveBackward(self):
         self.rightWheel.setSpeed(-0.4)
