@@ -114,7 +114,7 @@ class Robo():
 
         self.rodeDistance += max(abs(x) for x in linearVelocityValue) * dt
 
-        if (frontDropValue > MIN_DROP_HEIGHT and self.currentState != self.robotState.BACKWARD) or (self.currentState == self.robotState.FORWARD and frontBumperValue):
+        if (frontDropValue > MIN_DROP_HEIGHT) or (self.currentState == self.robotState.FORWARD and frontBumperValue):
             print("Obstaculo detectado a frente!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -149,7 +149,7 @@ class Robo():
             
             return
 
-        if (leftDropValue > 0.06 and self.currentState != self.robotState.BACKWARD) or (self.currentState == self.robotState.FORWARD and leftBumperValue):
+        if (leftDropValue > MIN_DROP_HEIGHT) or (self.currentState == self.robotState.FORWARD and leftBumperValue):
             print("Obstaculo detectado a esquerda!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -162,7 +162,7 @@ class Robo():
             self.deviateSide = "RIGHT"
             return
 
-        if (rightDropValue > 0.06 and self.currentState != self.robotState.BACKWARD) or (self.currentState == self.robotState.FORWARD and rightBumperValue):
+        if (rightDropValue > MIN_DROP_HEIGHT) or (self.currentState == self.robotState.FORWARD and rightBumperValue):
             print("Obstaculo detectado a direita!")
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
@@ -182,13 +182,18 @@ class Robo():
 
         match self.currentState:
             case self.robotState.FORWARD:
-                self.angularError += angularVelocityvalue[2] * dt * 2
+                self.angularError += angularVelocityvalue[2] * dt
+                correction = self.angularError * 2
                 #print(f'{self.angularError:.4f}')
                 if self.angularError > MAXDEVIATION:
-                    self.navigation._moveForward(0.8 + abs(self.angularError),0.8 - abs(self.angularError))
+                    left_speed = max(min(0.8 + correction, 0.8), 0)
+                    right_speed = max(min(0.8 - correction, 0.8), 0)
+                    self.navigation._moveForward(left_speed,right_speed)
                     pass
                 elif self.angularError < -MAXDEVIATION:
-                    self.navigation._moveForward(0.8 - abs(self.angularError),0.8 + abs(self.angularError))
+                    left_speed = max(min(0.8 - correction, 0.8), 0)
+                    right_speed = max(min(0.8 + correction, 0.8), 0)
+                    self.navigation._moveForward(left_speed,right_speed)
                     pass
                 else:
                     self.navigation._moveForward()
@@ -203,8 +208,10 @@ class Robo():
                     match self.nextState:
                         case self.robotState.DEVIATING_FIRST:
                             self.currentState = self.robotState.DEVIATING_FIRST
+
                         case self.robotState.TURNING180:
                             self.currentState = self.robotState.TURNING180
+                            
                         case _:
                             self.currentState = self.robotState.TURNING
                         
@@ -221,6 +228,7 @@ class Robo():
                 self.navigation._turnRobot(self.currentTurn,speed)
                 if self.relativeAngle >= self.turningAngleTarget:
                     self.relativeAngle = 0
+                    self.angularError = 0
                     self.currentState = self.robotState.FORWARD
                     
 
@@ -233,6 +241,7 @@ class Robo():
                 
                 if self.relativeAngle>= self.turningAngleTarget:
                     self.relativeAngle = 0
+                    self.angularError = 0
                     self.currentState = self.robotState.FORWARD
 
 
@@ -258,6 +267,7 @@ class Robo():
                 _getAngle(angularVelocityvalue[2])
                 if self.relativeAngle >= self.turningAngleTarget:
                     self.relativeAngle = 0
+                    self.angularError = 0
                     self.currentState = self.robotState.FORWARD
 
         
