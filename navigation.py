@@ -49,16 +49,17 @@ class Navigation:
             startTime = currTime
             
             if side == 'RIGHT':
+                print("Virando a Direita")
                 self.rightWheel.setSpeed(-0.08)
                 self.leftWheel.setSpeed(0.4)
                 self.turningSide = 'LEFT'
             else:
+                print("Virando a Esquerda")
                 self.leftWheel.setSpeed(-0.08)
                 self.rightWheel.setSpeed(0.4)
                 self.turningSide = 'RIGHT'
             _,angularVelocity = self.gyro.measureGyro()
             currAngle += math.degrees(angularVelocity[2] * dt)
-            print(f"angulo: {currAngle}")
 
         self._stopRobot()
 
@@ -76,7 +77,6 @@ class Navigation:
             self.leftWheel.setSpeed(-0.5)
             linearVelocity,_ = self.gyro.measureGyro()
             currDistance += linearVelocity[0] * dt
-            print(f"Distancia percorrida: {currDistance}")
             
         self._stopRobot()
 
