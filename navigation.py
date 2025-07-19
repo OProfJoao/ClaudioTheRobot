@@ -18,13 +18,13 @@ class Navigation:
     def _stopRobot(self):
         self._moveForward(0.0)
 
-    def _turnRobot(self, side):
+    def _turnRobot(self, side,speed=0.4):
         if side == 'RIGHT':
-            self.rightWheel.setSpeed(-0.1)
-            self.leftWheel.setSpeed(0.4)
+            self.rightWheel.setSpeed(0)
+            self.leftWheel.setSpeed(speed)
         else:
-            self.rightWheel.setSpeed(0.4)
-            self.leftWheel.setSpeed(-0.1)
+            self.rightWheel.setSpeed(speed)
+            self.leftWheel.setSpeed(0)
 
     def _turnRobot180(self):
             self.rightWheel.setSpeed(-0.4)
