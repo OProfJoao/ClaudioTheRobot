@@ -23,11 +23,17 @@ class Navigation:
             self.rightWheel.setSpeed(-0.08)
             self.leftWheel.setSpeed(0.4)
         else:
-
             self.rightWheel.setSpeed(0.4)
             self.leftWheel.setSpeed(-0.08)
-
 
     def _moveBackward(self):
         self.rightWheel.setSpeed(-0.4)
         self.leftWheel.setSpeed(-0.4)
+
+    def _deviate(self,side):
+        if side == 'RIGHT':
+            self.rightWheel.setSpeed(0.2)
+            self.leftWheel.setSpeed(0.4)
+        else:
+            self.rightWheel.setSpeed(0.4)
+            self.leftWheel.setSpeed(0.2)
