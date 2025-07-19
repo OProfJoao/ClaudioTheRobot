@@ -1,5 +1,5 @@
 
-from enum import Enum
+from enum import Enum, auto
 from sensors import *
 from actuators import *
 from navigation import Navigation
@@ -8,10 +8,11 @@ from sensors import *
 
 class Robo():
     class robotState(Enum):
-        STOPPED = 0
-        FORWARD = 1
-        BACKWARD = 2
-        TURNING_180 = 3
+        STOPPED = auto()
+        FORWARD = auto()
+        BACKWARD = auto()
+        TURNING = auto()
+        
 
     def __init__(self, sim, robotName):
         self.robotName = robotName
@@ -73,6 +74,10 @@ class Robo():
         leftBumperValue = self.leftBumper.measureDistance()[0]
         rightBumperValue = self.rightBumper.measureDistance()[0]
 
+        leftDropValue = self.leftDrop.measureDistance()[1]
+        rightDropValue  = self.rightDrop.measureDistance()[1]
+        frontDropValue = self.frontDrop.measureDistance()[1]
+
         linearVelocityValue, angularVelocityvalue = self.gyro.measureGyro()
 
         if self.currentState == self.robotState.FORWARD and frontBumperValue:
@@ -80,6 +85,16 @@ class Robo():
             self.setCurrentState(self.robotState.BACKWARD)
             self.backwardDistanceTarget = 0.2
             self.backwardDistance = 0.0
+            self.currentTurn = "LEFT" if self.currentTurn == "LEFT" else "RIGHT"
+            return
+
+        if not(leftDropValue < 0.06 and frontDropValue < 0.06 and rightDropValue <0.06):
+            print("Queda detectada!")
+            self.backwardDistance = 0.2
+            self.setCurrentState(self.robotState.BACKWARD)
+            return
+
+
 
         match self.getCurrentState():
             case self.robotState.FORWARD:
@@ -89,12 +104,18 @@ class Robo():
                 self.navigation._moveBackward()
                 self.backwardDistance += linearVelocityValue[0] * dt
                 if abs(self.backwardDistance) >= self.backwardDistanceTarget:
-                    self.setCurrentState(self.robotState.TURNING_180)
+                    self.setCurrentState(self.robotState.TURNING)
+                    self.backwardDistance = 0.0
+                    self.turningAngleTarget = 180
 
-            case self.robotState.TURNING_180:
+            case self.robotState.TURNING:
                 self.navigation._turnRobot(self.currentTurn)
                 self.turningAngle += math.degrees(angularVelocityvalue[2] * dt)
+                print(abs(self.turningAngle))
                 if abs(self.turningAngle) >= self.turningAngleTarget:
                     self.setCurrentState(self.robotState.FORWARD)
+                    self.turningAngle = 0.0
+
+
             case self.robotState.STOPPED:
                 self.navigation._stopRobot()
