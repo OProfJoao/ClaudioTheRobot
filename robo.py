@@ -97,11 +97,13 @@ class Robo():
             if self.firstTurn:
                 self.nextState = self.robotState.TURNING180
                 self.firstTurn = False
+                self.rodeDistance = 0
+                self.maxRodeDistance = 0
             else:
                 self.nextState = self.robotState.TURNING
 
                 print(f'rode: {self.rodeDistance} max: {self.maxRodeDistance}')
-                if self.rodeDistance > self.maxRodeDistance  :
+                if self.rodeDistance > (self.maxRodeDistance + 0.5)  :
                     print("A")
                     self.maxRodeDistance = self.rodeDistance
                     self.currentTurn = self.currentTurn
