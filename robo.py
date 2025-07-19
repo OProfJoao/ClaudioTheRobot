@@ -6,14 +6,12 @@ from navigation import Navigation
 from sensors import *
 
 
-
-
 class Robo():
     class robotState(Enum):
         STOPPED = 0
         FORWARD = 1
         BACKWARD = 2
-        TURNING = 3
+        TURNING_180 = 3
 
     def __init__(self, sim, robotName):
         self.robotName = robotName
@@ -21,6 +19,10 @@ class Robo():
         self.currentState = self.robotState.FORWARD
         self.lastTime = 0
         self.currentTurn = "RIGHT"
+        self.backwardDistanceTarget = 0.0
+        self.backwardDistance = 0.0
+        self.turningAngleTarget = 0.0
+        self.turningAngle = 0.0
 
         left_bumper_name = "/bumperLeft"
         right_bumper_name = "/bumperRight"
@@ -53,11 +55,12 @@ class Robo():
         self.leftWheel = Motors(sim, left_wheel_name, robotName)
         self.rightWheel = Motors(sim, right_wheel_name, robotName)
 
-        self.navigation = Navigation(leftWheel=self.leftWheel,rightWheel=self.rightWheel)
+        self.navigation = Navigation(
+            leftWheel=self.leftWheel, rightWheel=self.rightWheel)
 
     def getCurrentState(self):
         return self.currentState
-    
+
     def setCurrentState(self, state):
         self.currentState = state
 
@@ -74,18 +77,24 @@ class Robo():
 
         if self.currentState == self.robotState.FORWARD and frontBumperValue:
             print("Parede detectada!")
-            self.setCurrentState(self.robotState.STOPPED)
+            self.setCurrentState(self.robotState.BACKWARD)
+            self.backwardDistanceTarget = 0.2
+            self.backwardDistance = 0.0
 
         match self.getCurrentState():
             case self.robotState.FORWARD:
                 self.navigation._moveForward()
 
             case self.robotState.BACKWARD:
-                self.navigation._moveBackward
+                self.navigation._moveBackward()
+                self.backwardDistance += linearVelocityValue[0] * dt
+                if abs(self.backwardDistance) >= self.backwardDistanceTarget:
+                    self.setCurrentState(self.robotState.TURNING_180)
 
-            case self.robotState.TURNING:
+            case self.robotState.TURNING_180:
                 self.navigation._turnRobot(self.currentTurn)
-
+                self.turningAngle += math.degrees(angularVelocityvalue[2] * dt)
+                if abs(self.turningAngle) >= self.turningAngleTarget:
+                    self.setCurrentState(self.robotState.FORWARD)
             case self.robotState.STOPPED:
                 self.navigation._stopRobot()
-

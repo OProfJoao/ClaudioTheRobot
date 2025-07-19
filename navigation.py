@@ -12,7 +12,6 @@ class Navigation:
         self.rightWheel = rightWheel
 
     def _moveForward(self, speed=0.8):
-        print("Movendo para frente...")
         self.rightWheel.setSpeed(speed)
         self.leftWheel.setSpeed(speed)
 
@@ -20,7 +19,6 @@ class Navigation:
         self._moveForward(0.0)
 
     def _turnRobot(self, side):
-        self._stopRobot()
         if side == 'RIGHT':
             print("Virando para direita...")
             self.rightWheel.setSpeed(-0.08)
@@ -29,11 +27,9 @@ class Navigation:
             print("Virando para esquerda...")
             self.rightWheel.setSpeed(0.4)
             self.leftWheel.setSpeed(-0.08)
-        self._stopRobot()
+
 
     def _moveBackward(self):
         print("Dando ré...")
-        self._stopRobot()
         self.rightWheel.setSpeed(-0.4)
         self.leftWheel.setSpeed(-0.4)
-        self._stopRobot()
