@@ -19,7 +19,8 @@ def main():
         print("Iniciando teste")
         sim.startSimulation()
         while True:
-            vacuum.navigation.normalCleaning()
+            vacuum.normalCleaning()
+    
         
         
 

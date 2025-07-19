@@ -1,7 +1,11 @@
+from enum import Enum
 import math
 import time
 from actuators import Motors
 from sensors import ProximitySensor
+
+
+
 
 
 class Navigation:
@@ -17,7 +21,7 @@ class Navigation:
                  frontDrop,
                  gyro,
                  leftIR,
-                 frontIR,sim):
+                 frontIR, sim):
         self.leftWheel = leftWheel
         self.rightWheel = rightWheel
         self.leftBumper = leftBumper
@@ -31,6 +35,13 @@ class Navigation:
         self.frontIR = frontIR
         self.sim = sim
         self.turningSide = "RIGHT"
+        self.currentState = self.movementState.STOPPED
+
+    class movementState(Enum):
+        STOPPED = 0
+        FORWARD = 1
+        REVERSE = 2
+        TURNING = 3
 
     def _moveStraight(self, speed=0.8):
         self.rightWheel.setSpeed(speed)
@@ -39,7 +50,7 @@ class Navigation:
     def _stopRobot(self):
         self._moveStraight(0.0)
 
-    def _turn(self, side, targetAngle):    
+    def _turn(self, side, targetAngle):
         self._stopRobot()
         currAngle = 0
         startTime = self._getSimulationTime()
@@ -47,7 +58,7 @@ class Navigation:
             currTime = self._getSimulationTime()
             dt = currTime - startTime
             startTime = currTime
-            
+
             if side == 'RIGHT':
                 print("Virando a Direita")
                 self.rightWheel.setSpeed(-0.08)
@@ -58,7 +69,7 @@ class Navigation:
                 self.leftWheel.setSpeed(-0.08)
                 self.rightWheel.setSpeed(0.4)
                 self.turningSide = 'RIGHT'
-            _,angularVelocity = self.gyro.measureGyro()
+            _, angularVelocity = self.gyro.measureGyro()
             currAngle += math.degrees(angularVelocity[2] * dt)
 
         self._stopRobot()
@@ -75,23 +86,27 @@ class Navigation:
 
             self.rightWheel.setSpeed(-0.5)
             self.leftWheel.setSpeed(-0.5)
-            linearVelocity,_ = self.gyro.measureGyro()
+            linearVelocity, _ = self.gyro.measureGyro()
             currDistance += linearVelocity[0] * dt
-            
-        self._stopRobot()
 
-        
+        self._stopRobot()
 
     def _deviate(self, side):
         pass
 
-    def normalCleaning(self):
+    """def normalCleaning(self):
         self._moveStraight(0.8)
         if self.frontBumper.measureDistance()[0]:
             print("Parede detectada")
             self._reverse()
             self._turn(side=self.turningSide, targetAngle=180)
-
-
+"""
     def _getSimulationTime(self):
         return self.sim.getSimulationTime()
+
+
+    def getCurrentState(self):
+        return self.currentState
+    
+    def updateState(self, movementState):
+        self.currentState = movementState
