@@ -20,6 +20,8 @@ class Robo():
         self.robotName = robotName
         self.sim = sim
         self.currentState = self.robotState.FORWARD
+        self.nextState = self.robotState.FORWARD
+
         self.lastTime = 0
         self.currentTurn = "RIGHT"
         self.backwardDistanceTarget = 0.0
@@ -93,13 +95,14 @@ class Robo():
             if self.rodeDistance > self.maxRodeDistance  :
                 print("A")
                 self.maxRodeDistance = self.rodeDistance
-                self.currentTurn = "LEFT" if self.currentTurn == "RIGHT" else "RIGHT"
+                self.currentTurn = self.currentTurn
                 self.rodeDistance = 0
 
             else:
                 print("B")
                 self.maxRodeDistance = self.rodeDistance
-                self.currentTurn = self.currentTurn
+                
+                self.currentTurn = "LEFT" if self.currentTurn == "RIGHT" else "RIGHT"
                 self.rodeDistance = 0
 
             
@@ -111,7 +114,8 @@ class Robo():
             self.backwardDistance = 0.0
             self.turningAngleTarget = 45
             self.turningAngle = 0.0
-            self.currentState = self.robotState.DEVIATING_FIRST
+            self.currentState = self.robotState.BACKWARD
+            self.nextState = self.robotState.DEVIATING_FIRST
             self.deviateSide = "RIGHT"
             return
 
@@ -121,7 +125,8 @@ class Robo():
             self.backwardDistance = 0.0
             self.turningAngleTarget = 45
             self.turningAngle = 0.0
-            self.currentState = self.robotState.DEVIATING_FIRST
+            self.currentState = self.robotState.BACKWARD
+            self.nextState = self.robotState.DEVIATING_FIRST
             self.deviateSide = "LEFT"
             return
 
@@ -143,7 +148,10 @@ class Robo():
                 self.backwardDistance += max(abs(x)
                                              for x in linearVelocityValue) * dt
                 if self.backwardDistance >= self.backwardDistanceTarget:
-                    self.currentState = self.robotState.TURNING
+                    if self.nextState != self.robotState.DEVIATING_FIRST:
+                        self.currentState = self.robotState.TURNING
+                    else:
+                        self.currentState = self.robotState.DEVIATING_FIRST
 
             case self.robotState.STOPPED:
                 self.navigation._stopRobot()
@@ -154,12 +162,7 @@ class Robo():
 
                 self.turningAngle += math.degrees(angularVelocityvalue[2] * dt)
                 if abs(self.turningAngle) >= self.turningAngleTarget:
-                    if self.nextState == self.robotState.MOVING_CURVE:
-                        self.currentState = (self.nextState)
-                        self.turningAngleTarget = 90
-                        self.turningAngle = 0.0
-                    else:
-                        self.currentState = self.robotState.FORWARD
+                    self.currentState = self.robotState.FORWARD
 
             case self.robotState.DEVIATING_FIRST:
                 self.navigation._turnRobot(self.deviateSide)
