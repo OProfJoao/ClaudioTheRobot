@@ -205,7 +205,7 @@ class Robo():
         match self.currentState:
             case self.robotState.FORWARD:
                 error = _angleError(
-                    self.absoluteOrientationRad, self.targetAngle)
+                    self.absoluteOrientationRad, self.targetAngle) * 1.2
 
                 self.navigation._moveForward(0.5 - error, 0.5 + error)
 
@@ -234,7 +234,7 @@ class Robo():
                 print(
                     f"target: {self.targetAngle} / current: {self.absoluteOrientationRad} / error: {error}")
                 speed = abs(error) * 1.5
-                speed = max(0.1, min(speed, 0.8))
+                speed = max(0.05, min(speed, 0.8))
 
                 if abs(error) < TOLERANCE:
                     self.navigation._stopRobot()
@@ -251,7 +251,7 @@ class Robo():
                 print(
                     f"target: {self.targetAngle} / current: {self.absoluteOrientationRad} / error: {error}")
                 speed = abs(error) * 1.5
-                speed = max(0.1, min(speed, 0.8))
+                speed = max(0.05, min(speed, 0.8))
 
                 if abs(error) < TOLERANCE:
                     self.navigation._stopRobot()
@@ -267,7 +267,7 @@ class Robo():
                     self.absoluteOrientationRad, self.targetAngle)
 
                 speed = abs(error) * 1.5
-                speed = max(0.1, min(speed, 0.8))
+                speed = max(0.05, min(speed, 0.8))
 
                 if abs(error) < TOLERANCE:
                     self.navigation._stopRobot()
@@ -307,7 +307,7 @@ class Robo():
                 print(
                     f"target: {self.targetAngle} / current: {self.absoluteOrientationRad} / error: {error}")
                 speed = abs(error) * 1.5
-                speed = max(0.1, min(speed, 0.8))
+                speed = max(0.05, min(speed, 0.8))
 
                 if abs(error) < TOLERANCE:
                     self.navigation._stopRobot()
