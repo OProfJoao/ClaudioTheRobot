@@ -177,13 +177,13 @@ class Robo():
             self.initialAngle = self.absoluteOrientationRad
 
             self.currentDeviate = self.deviateSide.RIGHT.value
-            
+
             self.targetAngle = self.initialAngle + \
                 (_getRadians(45) * self.currentDeviate)
 
             self.currentState = self.robotState.BACKWARD
             self.nextState = self.robotState.DEVIATING_FIRST
-            
+
             return
 
         if (rightDropValue > MIN_DROP_HEIGHT) or (self.currentState == self.robotState.FORWARD and rightBumperValue):
@@ -199,13 +199,14 @@ class Robo():
 
             self.currentState = self.robotState.BACKWARD
             self.nextState = self.robotState.DEVIATING_FIRST
-            
+
             return
 
         match self.currentState:
             case self.robotState.FORWARD:
                 error = _angleError(
-                    self.absoluteOrientationRad, self.targetAngle) * 1.2
+                    self.absoluteOrientationRad, self.targetAngle) * 1.5
+                print("error: "+str(error))
 
                 self.navigation._moveForward(0.5 - error, 0.5 + error)
 
@@ -239,7 +240,7 @@ class Robo():
                 if abs(error) < TOLERANCE:
                     self.navigation._stopRobot()
 
-                    self.targetAngle = self.absoluteOrientationRad
+                    #self.targetAngle = self.absoluteOrientationRad
                     self.currentState = self.robotState.FORWARD
                     return
 
@@ -256,7 +257,7 @@ class Robo():
                 if abs(error) < TOLERANCE:
                     self.navigation._stopRobot()
 
-                    self.targetAngle = self.absoluteOrientationRad
+                    #self.targetAngle = self.absoluteOrientationRad
                     self.currentState = self.robotState.FORWARD
                     return
 
@@ -272,10 +273,10 @@ class Robo():
                 if abs(error) < TOLERANCE:
                     self.navigation._stopRobot()
                     self.initialAngle = self.absoluteOrientationRad
-                    
+
                     self.targetAngle = self.initialAngle + \
                         (_getRadians(90) * self.currentDeviate)
-                    
+
                     self.currentDeviate = self.currentDeviate * -1
                     self.currentState = self.robotState.DEVIATING_SECOND
                     return
@@ -289,13 +290,12 @@ class Robo():
                 print(
                     f"target: {self.targetAngle} / current: {self.absoluteOrientationRad} / error: {error}")
 
-
                 if abs(error) < TOLERANCE:
                     self.navigation._stopRobot()
                     self.initialAngle = self.absoluteOrientationRad
                     self.targetAngle = self.initialAngle + \
                         (_getRadians(45) * self.currentDeviate)
-                    
+
                     self.currentState = self.robotState.DEVIATING_THIRD
                     return
                 side = "LEFT" if self.currentDeviate == self.deviateSide.RIGHT.value else "RIGHT"
