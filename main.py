@@ -20,6 +20,7 @@ def main():
         sim.startSimulation()
         while True:
             vacuum.normalCleaning()
+            time.sleep(0.05)
     
         
         
