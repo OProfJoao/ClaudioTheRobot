@@ -4,11 +4,15 @@ from sensors import *
 from actuators import *
 from navigation import Navigation
 from sensors import *
-
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 MAXDEVIATION = 0.003
 MIN_DROP_HEIGHT = 0.06
 TOLERANCE = 0.01
+
+
 
 
 class Robo():
@@ -66,6 +70,7 @@ class Robo():
         )
 
     def __init__(self, sim, robotName):
+        self.ROBOTPATH = 
         self.sim = sim
         self.robotName = robotName
 
@@ -109,6 +114,10 @@ class Robo():
                 error += 2 * math.pi
             return error
 
+        def printPath():
+            
+
+
         currentTime = self.sim.getSimulationTime()
         dt = currentTime - self.lastTime
         self.lastTime = currentTime
@@ -126,6 +135,8 @@ class Robo():
         linearVelocityValue, angularVelocityvalue = self.gyro.measureGyro()
 
         self.absoluteOrientationRad += angularVelocityvalue[2] * dt
+
+        self.ROBOTPATH.append[left_speed,right_speed,angularVelocityvalue]
 
         # print(f'LeftWheel: {left_speed}/ RightWheel:{right_speed} / AngularV: {self.absoluteOrientationRad}')
 
