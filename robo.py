@@ -7,12 +7,14 @@ from sensors import *
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 MAXDEVIATION = 0.003
 MIN_DROP_HEIGHT = 0.06
 TOLERANCE = 0.01
 
-
+fig, ax = plt.subplots()
+line, = ax.plot([], [], 'r-')
 
 
 class Robo():
@@ -70,7 +72,6 @@ class Robo():
         )
 
     def __init__(self, sim, robotName):
-        self.ROBOTPATH = 
         self.sim = sim
         self.robotName = robotName
 
@@ -114,10 +115,6 @@ class Robo():
                 error += 2 * math.pi
             return error
 
-        def printPath():
-            
-
-
         currentTime = self.sim.getSimulationTime()
         dt = currentTime - self.lastTime
         self.lastTime = currentTime
@@ -136,8 +133,7 @@ class Robo():
 
         self.absoluteOrientationRad += angularVelocityvalue[2] * dt
 
-        self.ROBOTPATH.append[left_speed,right_speed,angularVelocityvalue]
-
+       
         # print(f'LeftWheel: {left_speed}/ RightWheel:{right_speed} / AngularV: {self.absoluteOrientationRad}')
 
         with open('Sensor Data', 'a') as file:
@@ -291,7 +287,7 @@ class Robo():
                     self.currentDeviate = self.currentDeviate * -1
                     self.currentState = self.robotState.DEVIATING_SECOND
                     return
-                
+
                 side = "LEFT" if self.currentDeviate == self.deviateSide.RIGHT.value else "RIGHT"
                 self.navigation._turnRobot(side, speed)
 

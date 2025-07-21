@@ -1,7 +1,7 @@
 from coppeliasim_zmqremoteapi_client import *
 import time
 from robo import Robo
-
+import os
 
 def main():
    
@@ -18,6 +18,7 @@ def main():
         print("Todos os objetos encontrados")
         print("Iniciando teste")
         sim.startSimulation()
+        print(os.listdir('./'))
         while True:
             vacuum.normalCleaning()
             time.sleep(0.05)
