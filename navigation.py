@@ -33,14 +33,21 @@ class Navigation:
             self.rightWheel.setSpeed(speed)
             self.leftWheel.setSpeed(-speed*TURN_AMOUNT)
 
-    def _turnRobot_in_axis(self,side,speed = 0.4):
-            if side == 'RIGHT':
-                self.rightWheel.setSpeed(-speed)
-                self.leftWheel.setSpeed(speed)
-            else:
-                self.rightWheel.setSpeed(speed)
-                self.leftWheel.setSpeed(-speed)
-
+    # def _turnRobot_in_axis(self,side,speed = 0.4):
+    #         if side == 'RIGHT':
+    #             self.rightWheel.setSpeed(-speed)
+    #             self.leftWheel.setSpeed(speed)
+    #         else:
+    #             self.rightWheel.setSpeed(speed)
+    #             self.leftWheel.setSpeed(-speed)
+    
+    def _turnRobot_in_axis(self, side, speed=0.4):
+                if side == 'RIGHT':
+                    self.rightWheel.setSpeed(-speed)
+                    self.leftWheel.setSpeed(speed)
+                else:
+                    self.rightWheel.setSpeed(speed)
+                    self.leftWheel.setSpeed(-speed)
     def _moveBackward(self):
         self.rightWheel.setSpeed(-0.4)
         self.leftWheel.setSpeed(-0.4)
