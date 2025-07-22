@@ -270,10 +270,9 @@ class Robo():
                 error = _angleError(
                     self.absoluteOrientationRad, self.targetAngle)
 
-                Kp = 0.6  # ajuste conforme necessário
-                speed = Kp * error  # pode ser positivo ou negativo
+                Kp = 0.6
+                speed = Kp * error
 
-                # Limita o módulo da velocidade, mantendo o sinal
                 if abs(speed) < MIN_SPEED_TURNING:
                     speed = MIN_SPEED_TURNING * (1 if speed >= 0 else -1)
                 elif abs(speed) > MAX_SPEED_TURNING:
@@ -287,7 +286,6 @@ class Robo():
                     self.currentState = self.robotState.FORWARD
                     return
 
-                # Gira para a direita se speed < 0, esquerda se speed > 0
                 side = "RIGHT" if speed < 0 else "LEFT"
                 self.navigation._turnRobot_in_axis(side=side, speed=abs(speed))
 
