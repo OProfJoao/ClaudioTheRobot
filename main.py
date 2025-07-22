@@ -33,7 +33,7 @@ def main():
         
         while True:
             vacuum.normalCleaning()
-            time.sleep(0.05)
+            time.sleep(0.01)
     
         
         
