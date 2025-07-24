@@ -125,9 +125,9 @@ class Robo():
         frontBumperValue = self.frontBumper.measureDistance()[0]
         rightBumperValue = self.rightBumper.measureDistance()[0]
 
-        leftDropValue = self.leftDrop.measureDistance()[1]
-        frontDropValue = self.frontDrop.measureDistance()[1]
-        rightDropValue = self.rightDrop.measureDistance()[1]
+        leftDropValue = self.leftDrop.measureDistance()[1] > MIN_DROP_HEIGHT
+        frontDropValue = self.frontDrop.measureDistance()[1] > MIN_DROP_HEIGHT
+        rightDropValue = self.rightDrop.measureDistance()[1] > MIN_DROP_HEIGHT
 
         left_speed, right_speed = self.navigation._getSpeed()
 
@@ -142,11 +142,13 @@ class Robo():
             self.absoluteOrientationRad += angularVelocityvalue[2] * dt
 
         # print(f'LeftWheel: {left_speed}/ RightWheel:{right_speed} / AngularV: {self.absoluteOrientationRad}')
-
+        
         with open(self.savePath, 'a') as file:
-            file.write(
-                f'{dt};{left_speed};{right_speed};{self.absoluteOrientationRad}\n')
-
+            dataToSave = [dt,left_speed,right_speed,self.absoluteOrientationRad, leftBumperValue,frontBumperValue,rightBumperValue,leftDropValue,frontDropValue,rightDropValue]
+            for item in dataToSave:
+                file.write(f'{item};')
+            file.write('\n')
+            
         self.rodeDistance += max(abs(x) for x in linearVelocityValue) * dt
 
         if (frontDropValue > MIN_DROP_HEIGHT) or (self.currentState == self.robotState.FORWARD and frontBumperValue):
